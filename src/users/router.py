@@ -1,6 +1,6 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -11,6 +11,17 @@ router = APIRouter(
     prefix='/api/v1/users',
     tags=['users']
 )
+
+
+@router.post('/', response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = service.get_user_by_email(db, user_email=user.email)
+    if db_user:
+        raise HTTPException(status_code=422, detail='Email already registered')
+    db_user = service.get_user_by_phone_number(db, user_phone_number=user.phone_number)
+    if db_user:
+        raise HTTPException(status_code=422, detail='Phone number already registered')
+    return service.create_user(db=db, user=user)
 
 
 @router.get('/', response_model=list[schemas.UserResponse])
