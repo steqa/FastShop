@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 
+from .auth import get_password_hash
 from .models import User
 from .schemas import UserCreate, UserInDB
 
 
 def create_user(db: Session, user: UserCreate) -> User:
-    user_in_db = UserInDB(**user.model_dump(), hashed_password=user.password + '_fakehash')
+    hashed_password = get_password_hash(user.password)
+    user_in_db = UserInDB(**user.model_dump(), hashed_password=hashed_password)
     db_user = User(**user_in_db.model_dump())
     db.add(db_user)
     db.commit()
