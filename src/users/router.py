@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from . import schemas, service
+from .exceptions import UserEmailExists, UserPhoneNumberExists
 from .pagination import Pagination
 
 router = APIRouter(
@@ -17,10 +18,10 @@ router = APIRouter(
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = service.get_user_by_email(db, user_email=user.email)
     if db_user:
-        raise HTTPException(status_code=422, detail='Email already registered')
+        raise UserEmailExists
     db_user = service.get_user_by_phone_number(db, user_phone_number=user.phone_number)
     if db_user:
-        raise HTTPException(status_code=422, detail='Phone number already registered')
+        raise UserPhoneNumberExists
     return service.create_user(db=db, user=user)
 
 

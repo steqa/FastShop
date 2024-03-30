@@ -35,7 +35,6 @@ class UserCreate(UserBase):
             raise ValueError('Password must have at least one digit')
         if not re.search(special_char_regex, password):
             raise ValueError('Password must have at least one special character')
-        
         return password
 
     @field_validator('password_confirm')
