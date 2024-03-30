@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr, ValidationInfo, field_validator
 
 
 class UserBase(BaseModel):
-    email: str
+    email: EmailStr
     phone_number: str
     first_name: str
     last_name: str
@@ -14,7 +14,6 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    email: EmailStr
     password: str
     password_confirm: str
     
@@ -49,7 +48,3 @@ class UserResponse(UserBase):
     is_active: bool
     created_at: datetime.datetime
     updated_at: datetime.datetime
-
-
-class UserInDB(UserBase):
-    hashed_password: str

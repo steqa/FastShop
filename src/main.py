@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -19,7 +19,7 @@ def handle_validation_error(request: Request, exc: RequestValidationError):
     else:
         errors = exc.errors()
     
-    status_code = getattr(exc, 'status_code', 422)
+    status_code = getattr(exc, 'status_code', status.HTTP_422_UNPROCESSABLE_ENTITY)
     detail = []
     for error in errors:
         er_loc = error['loc']

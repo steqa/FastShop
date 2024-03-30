@@ -1,4 +1,5 @@
 from fastapi.exceptions import RequestValidationError
+from fastapi import status
 
 
 class MultiValidationError(RequestValidationError):
@@ -24,7 +25,7 @@ class UserEmailExists(BaseCustomError, RequestValidationError):
     type = 'value_error'
     
     def __init__(self):
-        self.status_code = 409
+        self.status_code = status.HTTP_409_CONFLICT
         super().__init__(self.errors())
         
 
@@ -34,5 +35,5 @@ class UserPhoneNumberExists(BaseCustomError, RequestValidationError):
     type = 'value_error'
     
     def __init__(self):
-        self.status_code = 409
+        self.status_code = status.HTTP_409_CONFLICT
         super().__init__(self.errors())

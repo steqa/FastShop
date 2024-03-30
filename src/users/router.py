@@ -25,7 +25,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     if db_user:
         errors.append(UserPhoneNumberExists)
     if errors:
-        raise MultiValidationError(errors, status_code=409)
+        raise MultiValidationError(errors, status_code=status.HTTP_409_CONFLICT)
     return service.create_user(db=db, user=user)
 
 
@@ -39,5 +39,5 @@ def get_users(pagination: Pagination = Depends(), db: Session = Depends(get_db))
 def get_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
     user = service.get_user(db, user_id=user_id)
     if not user:
-        raise HTTPException(status_code=404, detail='User not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User not found')
     return user
