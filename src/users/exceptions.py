@@ -1,6 +1,13 @@
 from fastapi.exceptions import RequestValidationError
 
 
+class MultiValidationError(RequestValidationError):
+	def __init__(self, error_classes, status_code: int):
+		self.status_code = status_code
+		errors = [error.errors() for error in error_classes]
+		super().__init__(errors)
+
+
 class BaseCustomError(Exception):
     @classmethod
     def errors(cls):

@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from . import schemas, service
-from .exceptions import UserEmailExists, UserPhoneNumberExists
+from .exceptions import (MultiValidationError, UserEmailExists,
+                         UserPhoneNumberExists)
 from .pagination import Pagination
 
 router = APIRouter(
@@ -16,12 +17,15 @@ router = APIRouter(
 
 @router.post('/', response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    errors = []
     db_user = service.get_user_by_email(db, user_email=user.email)
     if db_user:
-        raise UserEmailExists
+        errors.append(UserEmailExists)
     db_user = service.get_user_by_phone_number(db, user_phone_number=user.phone_number)
     if db_user:
-        raise UserPhoneNumberExists
+        errors.append(UserPhoneNumberExists)
+    if errors:
+        raise MultiValidationError(errors, status_code=409)
     return service.create_user(db=db, user=user)
 
 
