@@ -1,6 +1,8 @@
 from fastapi import status
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import HTTPException, RequestValidationError
 
+
+# ----------------------------- Validation Errors -----------------------------
 
 class BaseValidationError(RequestValidationError):
     status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -37,3 +39,21 @@ class UserPhoneNumberExists(BaseValidationError):
     field = 'phone_number'
     message = 'Phone number already registered'
     type = 'value_error'
+
+
+# ------------------------------ HTTP Exceptions ------------------------------
+
+class BaseHTTPException(HTTPException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = 'Bad Request'
+
+    def __init__(self):
+        super().__init__(
+            status_code=self.status_code,
+            detail=self.detail
+        )
+
+
+class UserNotFound(BaseHTTPException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = 'User not found'

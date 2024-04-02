@@ -1,15 +1,18 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from src.database import get_db
-from . import schemas, service
+from . import schemas, service, utils
+from .dependencies import authenticate_user, get_current_auth_user
 from .exceptions import (
     MultiValidationError,
     UserEmailExists,
+    UserNotFound,
     UserPhoneNumberExists
 )
+from .models import User
 from .pagination import Pagination
 
 router = APIRouter(
@@ -65,6 +68,5 @@ def get_user(
 ):
     user = service.get_user_by_uuid(db, user_uuid=user_uuid)
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='User not found')
+        raise UserNotFound
     return user
