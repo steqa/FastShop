@@ -175,3 +175,5 @@ migrations/
 /src/.env
 /.env.docker
 /.idea/
+
+*.pem
