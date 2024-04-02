@@ -13,6 +13,10 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
+def validate_password(password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(password, hashed_password)
+
+
 def encode_jwt(
         payload: dict,
         expire_minutes: int,

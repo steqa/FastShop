@@ -54,6 +54,16 @@ class BaseHTTPException(HTTPException):
         )
 
 
+class AuthError(BaseHTTPException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Invalid email or password'
+
+
+class UserInactive(BaseHTTPException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = 'User inactive'
+
+
 class UserNotFound(BaseHTTPException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = 'User not found'
