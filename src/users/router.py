@@ -29,6 +29,7 @@ router = APIRouter(
 def create_user(
         user: schemas.UserCreate,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_auth_user)
 ):
     errors = []
     db_user = service.get_user_by_email(db, email=user.email)
@@ -53,6 +54,7 @@ def create_user(
 def get_users(
         pagination: Pagination = Depends(),
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_auth_user)
 ):
     users = service.get_users(db, pagination.skip, pagination.limit)
     return users
@@ -87,6 +89,7 @@ def get_current_user(current_user: User = Depends(get_current_auth_user)):
 def get_user(
         user_uuid: uuid.UUID,
         db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_auth_user)
 ):
     user = service.get_user_by_uuid(db, user_uuid=user_uuid)
     if not user:
