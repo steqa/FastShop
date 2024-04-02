@@ -16,7 +16,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
     password_confirm: str
-    
+
     @field_validator('password')
     def validate_password(cls, password: str, info: ValidationInfo) -> str:
         uppercase_regex = re.compile(r'[A-Z]')
@@ -29,15 +29,23 @@ class UserCreate(UserBase):
         if not re.search(uppercase_regex, password):
             raise ValueError('Password must have at least one capital letter')
         if not re.search(lowercase_regex, password):
-            raise ValueError('Password must have at least one lowercase letter')
+            raise ValueError(
+                'Password must have at least one lowercase letter'
+            )
         if not re.search(digit_regex, password):
             raise ValueError('Password must have at least one digit')
         if not re.search(special_char_regex, password):
-            raise ValueError('Password must have at least one special character')
+            raise ValueError(
+                'Password must have at least one special character'
+            )
         return password
 
     @field_validator('password_confirm')
-    def validate_password_confirm(cls, password_confirm: str, info: ValidationInfo) -> str:
+    def validate_password_confirm(
+            cls,
+            password_confirm: str,
+            info: ValidationInfo
+    ) -> str:
         if password_confirm != info.data.get('password'):
             raise ValueError("Passwords don't match")
         return password_confirm

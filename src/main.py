@@ -13,13 +13,16 @@ app.include_router(users_router.router)
 
 
 @app.exception_handler(RequestValidationError)
-def handle_validation_error(request: Request, exc: RequestValidationError):
-    if type(exc.errors()) is dict:
-        errors = list(exc.errors())
-    else:
-        errors = exc.errors()
-    
-    status_code = getattr(exc, 'status_code', status.HTTP_422_UNPROCESSABLE_ENTITY)
+def handle_validation_error(
+        request: Request,
+        exc: RequestValidationError
+) -> JSONResponse:
+    errors = exc.errors()
+    if type(errors) is dict:
+        errors = [errors]
+
+    status_code = getattr(exc, 'status_code',
+                          status.HTTP_422_UNPROCESSABLE_ENTITY)
     detail = []
     for error in errors:
         er_loc = error['loc']

@@ -1,17 +1,16 @@
-from fastapi.exceptions import RequestValidationError
 from fastapi import status
+from fastapi.exceptions import RequestValidationError
 
 
-class MultiValidationError(RequestValidationError):
-	def __init__(self, error_classes, status_code: int):
-		self.status_code = status_code
-		errors = [error.errors() for error in error_classes]
-		super().__init__(errors)
+class BaseValidationError(RequestValidationError):
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    field = message = type = 'string'
 
+    def __init__(self):
+        super().__init__(self.errors())
 
-class BaseCustomError(Exception):
     @classmethod
-    def errors(cls):
+    def errors(cls) -> dict:
         return {
             'loc': ['body', cls.field],
             'msg': cls.message,
@@ -19,21 +18,22 @@ class BaseCustomError(Exception):
         }
 
 
-class UserEmailExists(BaseCustomError, RequestValidationError):
+class MultiValidationError(RequestValidationError):
+    def __init__(self, error_classes, status_code: int):
+        self.status_code = status_code
+        errors = [error.errors() for error in error_classes]
+        super().__init__(errors)
+
+
+class UserEmailExists(BaseValidationError):
+    status_code = status.HTTP_409_CONFLICT
     field = 'email'
     message = 'Email already registered'
     type = 'value_error'
-    
-    def __init__(self):
-        self.status_code = status.HTTP_409_CONFLICT
-        super().__init__(self.errors())
-        
 
-class UserPhoneNumberExists(BaseCustomError, RequestValidationError):
+
+class UserPhoneNumberExists(BaseValidationError):
+    status_code = status.HTTP_409_CONFLICT
     field = 'phone_number'
     message = 'Phone number already registered'
     type = 'value_error'
-    
-    def __init__(self):
-        self.status_code = status.HTTP_409_CONFLICT
-        super().__init__(self.errors())
