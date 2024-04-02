@@ -4,6 +4,7 @@ import jwt
 from passlib.context import CryptContext
 
 from src.config import settings
+from .models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -36,3 +37,27 @@ def decode_jwt(
 ) -> dict:
     payload = jwt.decode(token, public_key, algorithms=[algorithm])
     return payload
+
+
+def get_access_token(user: User) -> str:
+    payload = {
+        'sub': user.email,
+        'email': user.email
+    }
+    access_token = encode_jwt(
+        payload=payload,
+        expire_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    return access_token
+
+
+def get_refresh_token(user: User) -> str:
+    payload = {
+        'sub': user.email,
+        'email': user.email
+    }
+    refresh_token = encode_jwt(
+        payload=payload,
+        expire_minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
+    )
+    return refresh_token
