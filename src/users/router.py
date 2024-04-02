@@ -7,8 +7,12 @@ from src.database import get_db
 from . import schemas, service, utils
 from .dependencies import authenticate_user, get_current_auth_user
 from .exceptions import (
+    AuthError,
     MultiValidationError,
+    NotAuthenticated,
+    TokenInvalid,
     UserEmailExists,
+    UserInactive,
     UserNotFound,
     UserPhoneNumberExists
 )
@@ -25,6 +29,10 @@ router = APIRouter(
     '/',
     response_model=schemas.UserResponse,
     status_code=status.HTTP_201_CREATED,
+    responses=dict([
+        NotAuthenticated.response_example(),
+        TokenInvalid.response_example()
+    ])
 )
 def create_user(
         user: schemas.UserCreate,
@@ -50,6 +58,10 @@ def create_user(
 @router.get(
     '/',
     response_model=list[schemas.UserResponse],
+    responses=dict([
+        NotAuthenticated.response_example(),
+        TokenInvalid.response_example()
+    ])
 )
 def get_users(
         pagination: Pagination = Depends(),
@@ -63,6 +75,10 @@ def get_users(
 @router.post(
     '/login/',
     response_model=schemas.Token,
+    responses=dict([
+        AuthError.response_example(),
+        UserInactive.response_example()
+    ])
 )
 def login_user(user: User = Depends(authenticate_user)):
     access_token = utils.get_access_token(user)
@@ -77,6 +93,10 @@ def login_user(user: User = Depends(authenticate_user)):
 @router.get(
     '/me/',
     response_model=schemas.UserResponse,
+    responses=dict([
+        NotAuthenticated.response_example(),
+        TokenInvalid.response_example()
+    ])
 )
 def get_current_user(current_user: User = Depends(get_current_auth_user)):
     return current_user
@@ -85,6 +105,11 @@ def get_current_user(current_user: User = Depends(get_current_auth_user)):
 @router.get(
     '/{user_uuid}/',
     response_model=schemas.UserResponse,
+    responses=dict([
+        NotAuthenticated.response_example(),
+        TokenInvalid.response_example(),
+        UserNotFound.response_example()
+    ])
 )
 def get_user(
         user_uuid: uuid.UUID,

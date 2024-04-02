@@ -53,6 +53,16 @@ class BaseHTTPException(HTTPException):
             detail=self.detail
         )
 
+    @classmethod
+    def response_example(cls) -> tuple[int, dict]:
+        return (
+            cls.status_code, {
+                'content': {'application/json': {'example': {
+                    'detail': cls.detail
+                }}}
+            }
+        )
+
 
 class TokenInvalid(BaseHTTPException):
     status_code = status.HTTP_401_UNAUTHORIZED
@@ -72,3 +82,8 @@ class UserInactive(BaseHTTPException):
 class UserNotFound(BaseHTTPException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = 'User not found'
+
+
+class NotAuthenticated(BaseHTTPException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = 'Not authenticated'
