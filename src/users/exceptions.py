@@ -54,6 +54,11 @@ class BaseHTTPException(HTTPException):
         )
 
 
+class TokenInvalid(BaseHTTPException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'Token invalid'
+
+
 class AuthError(BaseHTTPException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = 'Invalid email or password'

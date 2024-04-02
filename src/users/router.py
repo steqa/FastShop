@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from . import schemas, service, utils
-from .dependencies import authenticate_user
+from .dependencies import authenticate_user, get_current_auth_user
 from .exceptions import (
     MultiValidationError,
     UserEmailExists,
@@ -70,6 +70,14 @@ def login_user(user: User = Depends(authenticate_user)):
         refresh_token=refresh_token,
         token_type='Bearer'
     )
+
+
+@router.get(
+    '/me/',
+    response_model=schemas.UserResponse,
+)
+def get_current_user(current_user: User = Depends(get_current_auth_user)):
+    return current_user
 
 
 @router.get(
